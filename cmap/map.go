@@ -4,7 +4,52 @@ import (
 	"sync"
 )
 
-type ConcurrentMap struct {
+type LongConcurrentHashMap struct {
 	sync.RWMutex
 	m map[int64]interface {}
+}
+
+func NewLongConcurrentHashMap() (*LongConcurrentHashMap, error) {
+
+	m := &LongConcurrentHashMap{
+		m: make(map[int64]interface {}),
+	}
+
+	return m, nil
+}
+
+func (m *LongConcurrentHashMap) Put(key int64, value interface {}) {
+	m.Lock()
+	defer m.Unlock()
+
+	m.m[key] = value
+}
+
+func (m *LongConcurrentHashMap) Get(key int64) (interface {}, bool) {
+	m.RLock()
+	defer m.RUnlock()
+
+	value, ok := m.m[key]
+
+	return value, ok
+}
+
+func (m *LongConcurrentHashMap) Remove(key int64) {
+	m.Lock()
+	defer m.Unlock()
+
+	delete(m.m, key)
+}
+
+func (m *LongConcurrentHashMap) Size() int {
+	return len(m.m)
+}
+
+func (m *LongConcurrentHashMap) Contains(key int64) bool {
+	m.RLock()
+	defer m.RUnlock()
+
+	_, ok := m.m[key]
+
+	return ok
 }
