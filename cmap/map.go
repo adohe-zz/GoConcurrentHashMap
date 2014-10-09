@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-type LongConcurrentHashMap struct {
+type SimpleLongConcurrentHashMap struct {
 	sync.RWMutex
 	m map[int64]interface {}
 }
@@ -14,20 +14,20 @@ type MapEntry struct {
 	value interface {}
 }
 
-func NewLongConcurrentHashMap() *LongConcurrentHashMap {
-	return &LongConcurrentHashMap{
+func NewLongConcurrentHashMap() *SimpleLongConcurrentHashMap {
+	return &SimpleLongConcurrentHashMap{
 		m: make(map[int64]interface {}),
 	}
 }
 
-func (m *LongConcurrentHashMap) Put(key int64, value interface {}) {
+func (m *SimpleLongConcurrentHashMap) Put(key int64, value interface {}) {
 	m.Lock()
 	defer m.Unlock()
 
 	m.m[key] = value
 }
 
-func (m *LongConcurrentHashMap) Get(key int64) (interface {}, bool) {
+func (m *SimpleLongConcurrentHashMap) Get(key int64) (interface {}, bool) {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -36,18 +36,21 @@ func (m *LongConcurrentHashMap) Get(key int64) (interface {}, bool) {
 	return value, ok
 }
 
-func (m *LongConcurrentHashMap) Remove(key int64) {
+func (m *SimpleLongConcurrentHashMap) Remove(key int64) {
 	m.Lock()
 	defer m.Unlock()
 
 	delete(m.m, key)
 }
 
-func (m *LongConcurrentHashMap) Size() int {
+func (m *SimpleLongConcurrentHashMap) Size() int {
+	m.RLock()
+	defer m.RUnlock()
+
 	return len(m.m)
 }
 
-func (m *LongConcurrentHashMap) Contains(key int64) bool {
+func (m *SimpleLongConcurrentHashMap) Contains(key int64) bool {
 	m.RLock()
 	defer m.RUnlock()
 
@@ -56,11 +59,11 @@ func (m *LongConcurrentHashMap) Contains(key int64) bool {
 	return ok
 }
 
-func (m *LongConcurrentHashMap) IsEmpty() bool {
+func (m *SimpleLongConcurrentHashMap) IsEmpty() bool {
 	return m.Size() == 0
 }
 
-func (m *LongConcurrentHashMap) Clear() {
+func (m *SimpleLongConcurrentHashMap) Clear() {
 	m.Lock()
 	defer m.Unlock()
 
