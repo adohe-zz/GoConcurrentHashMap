@@ -9,6 +9,11 @@ type LongConcurrentHashMap struct {
 	m map[int64]interface {}
 }
 
+type MapEntry struct {
+	key int64
+	value interface {}
+}
+
 func NewLongConcurrentHashMap() (*LongConcurrentHashMap, error) {
 
 	m := &LongConcurrentHashMap{
@@ -52,4 +57,15 @@ func (m *LongConcurrentHashMap) Contains(key int64) bool {
 	_, ok := m.m[key]
 
 	return ok
+}
+
+func (m *LongConcurrentHashMap) IsEmpty() bool {
+	return m.Size() == 0
+}
+
+func (m *LongConcurrentHashMap) Clear() {
+	m.Lock()
+	defer m.Unlock()
+
+	m.m = make(map[int64]interface {})
 }
