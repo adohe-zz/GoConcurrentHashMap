@@ -14,13 +14,10 @@ type MapEntry struct {
 	value interface {}
 }
 
-func NewLongConcurrentHashMap() (*LongConcurrentHashMap, error) {
-
-	m := &LongConcurrentHashMap{
+func NewLongConcurrentHashMap() *LongConcurrentHashMap {
+	return &LongConcurrentHashMap{
 		m: make(map[int64]interface {}),
 	}
-
-	return m, nil
 }
 
 func (m *LongConcurrentHashMap) Put(key int64, value interface {}) {
