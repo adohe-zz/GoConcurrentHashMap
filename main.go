@@ -2,23 +2,26 @@ package main
 
 import (
 	"fmt"
-	"cmap"
 )
 
 func main() {
 	fmt.Println("beepboop")
-	m := cmap.NewLongConcurrentHashMap()
-
-	m.Put(5, "hello")
-
-	temp, ok := m.Get(5)
-
-	if ok == true {
-		value := temp.(string)
-		fmt.Println(value)
+	sshift := 0
+	ssize := 1
+	for ssize < 17 {
+		sshift ++
+		ssize <<= 1
 	}
 
-	m.Remove(5)
-
-	fmt.Println("helloworld")
+	c := 33 / ssize
+	if c * ssize < 33 {
+		c ++
+	}
+	cap := 1
+	for cap < c {
+		cap <<= 1
+	}
+	fmt.Println(ssize)
+	fmt.Println(sshift)
+	fmt.Println(cap)
 }
