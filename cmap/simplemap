@@ -14,7 +14,7 @@ type MapEntry struct {
 	value interface{}
 }
 
-func NewLongConcurrentHashMap() *SimpleLongConcurrentHashMap {
+func NewSimpleLongConcurrentHashMap() *SimpleLongConcurrentHashMap {
 	return &SimpleLongConcurrentHashMap{
 		m: make(map[int64]interface{}),
 	}
