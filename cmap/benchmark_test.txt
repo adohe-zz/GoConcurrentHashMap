@@ -1,16 +1,16 @@
 PASS
-BenchmarkSlottedLongMap	 5000000	       339 ns/op
+BenchmarkSlottedLongMap	 5000000	       342 ns/op
 --- BENCH: BenchmarkSlottedLongMap
 	concurrency_test.go:35: SlottedMap Operations: 1  Length: 0 Load:[0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0]
 	concurrency_test.go:35: SlottedMap Operations: 100  Length: 31 Load:[4 0 2 2 4 0 1 1 2 5 3 1 1 1 4 0]
 	concurrency_test.go:35: SlottedMap Operations: 10000  Length: 3259 Load:[201 205 206 200 215 188 208 216 191 190 214 222 200 197 164 242]
 	concurrency_test.go:35: SlottedMap Operations: 1000000  Length: 333096 Load:[20836 20556 20727 20468 20944 20917 20952 20844 20576 20963 20845 20616 20820 21007 21107 20918]
-	concurrency_test.go:35: SlottedMap Operations: 5000000  Length: 1669061 Load:[104398 104841 104656 104637 104219 104037 104563 103908 104475 104404 103813 103947 104540 104366 104205 104052]
-BenchmarkSimpleLongMap	 5000000	       330 ns/op
+	concurrency_test.go:35: SlottedMap Operations: 5000000  Length: 1669075 Load:[104396 104844 104657 104639 104221 104036 104563 103910 104475 104399 103815 103947 104544 104366 104205 104058]
+BenchmarkSimpleLongMap	10000000	       347 ns/op
 --- BENCH: BenchmarkSimpleLongMap
 	concurrency_test.go:40: SlottedMap Operations: 1  Length: 0
-	concurrency_test.go:40: SlottedMap Operations: 100  Length: 32
-	concurrency_test.go:40: SlottedMap Operations: 10000  Length: 3370
+	concurrency_test.go:40: SlottedMap Operations: 100  Length: 31
+	concurrency_test.go:40: SlottedMap Operations: 10000  Length: 3369
 	concurrency_test.go:40: SlottedMap Operations: 1000000  Length: 333112
-	concurrency_test.go:40: SlottedMap Operations: 5000000  Length: 1665334
-ok  	GoConcurrentHashMap/cmap	3.997s
+	concurrency_test.go:40: SlottedMap Operations: 10000000  Length: 3331945
+ok  	GoConcurrentHashMap/cmap	5.847s
