@@ -6,11 +6,11 @@ import (
 )
 
 type Girl struct {
-	name string
+	Name string
 }
 
 func TestMapCreation(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	if m == nil {
 		t.Error("map is null")
@@ -22,7 +22,7 @@ func TestMapCreation(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
    	lily := Girl{"Lily"}
 	lucy := Girl{"Lucy"}
@@ -36,7 +36,7 @@ func TestPut(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	value, ok := m.Get(1)
 
@@ -52,7 +52,7 @@ func TestGet(t *testing.T) {
 	m.Put(1, clair)
 	temp, ok := m.Get(1)
 
-	value := temp.(Girl)
+	clair = temp.(Girl)
 
 	if ok == false {
 		t.Error("ok should be true")
@@ -60,13 +60,13 @@ func TestGet(t *testing.T) {
 	if &value == nil {
 		t.Error("value should not be null")
 	}
-	if value.name != "Clair" {
+	if clair.Name != "Clair" {
 		t.Error("value is modified")
 	}
 }
 
 func TestRemove(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	alice := Girl{"Alice"}
 	m.Put(3, alice)
@@ -77,7 +77,7 @@ func TestRemove(t *testing.T) {
 	}
 
 	m.Remove(3)
-	temp, ok := m.Get(3)
+	temp, ok = m.Get(3)
 	if ok == true {
 		t.Error("ok should be false")
 	}
@@ -87,7 +87,7 @@ func TestRemove(t *testing.T) {
 }
 
 func TestSize(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	if m.Size() != 0 {
 		t.Error("map should be empty")
@@ -104,7 +104,7 @@ func TestSize(t *testing.T) {
 }
 
 func TestContains(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	if m.Contains(1) == true {
 		t.Error("map should not contain this key")
@@ -119,7 +119,7 @@ func TestContains(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	if m.IsEmpty() == false {
 		t.Error("map should be empty")
@@ -132,7 +132,7 @@ func TestIsEmpty(t *testing.T) {
 }
 
 func TestClear(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 
 	m.Clear()
 	if m.Size() != 0 {
@@ -147,16 +147,16 @@ func TestClear(t *testing.T) {
 }
 
 func TestConcurrent(t *testing.T) {
-	m := NewLongConcurrentHashMap()
+	m := NewSimpleLongConcurrentHashMap()
 	ch := make(chan string)
 	const loop = 2000
 	var s [loop]string
 
 	go func() {
 		for i := 0; i < loop/2; i++ {
-			m.Put(i, strconv.Itoa(i))
+			m.Put(int64(i), strconv.Itoa(i))
 
-			value, _ := m.Get(i)
+			value, _ := m.Get(int64(i))
 
 			ch <- value.(string)
 		}
@@ -164,9 +164,9 @@ func TestConcurrent(t *testing.T) {
 
 	go func() {
 		for i := loop/2; i < loop; i++ {
-			m.Put(i, strconv.Itoa(i))
+			m.Put(int64(i), strconv.Itoa(i))
 
-			value, _ := m.Get(i)
+			value, _ := m.Get(int64(i))
 
 			ch <- value.(string)
 		}

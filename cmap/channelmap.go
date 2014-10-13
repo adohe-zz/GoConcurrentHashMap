@@ -1,14 +1,5 @@
 package cmap
 
-type OpCode int
-
-const (
-	Get OpCode = iota
-	Put
-	Remove
-	Clear
-	Size
-)
 type Command struct {
 	operation OpCode
 	key int64
@@ -34,8 +25,6 @@ func NewChannelLongConcurrentHashMap(bufferSize int) *ChannelLongConcurrentHashM
 					m[i.key] = i.value
 				case Remove:
 					delete(m, i.key)
-				case Size:
-					
 			}
 		}
 	}()
@@ -43,8 +32,18 @@ func NewChannelLongConcurrentHashMap(bufferSize int) *ChannelLongConcurrentHashM
 	return &ChannelLongConcurrentHashMap{m, c}
 }
 
-func (m *ChannelLongConcurrentHashMap) Get(key int64) (interface{}, bool) {
+func (m *ChannelLongConcurrentHashMap) Get(key int64) interface{} {
 	c := Command{Get, key, 0, make(chan interface{})}
 	m.c <- c
-	
+	return <- c.result
+}
+
+func (m *ChannelLongConcurrentHashMap) Put(key int64, value interface{}) {
+	c := Command{Put, key, value, make(chan interface{})}
+	m.c <- c
+}
+
+func (m *ChannelLongConcurrentHashMap) Remove(key int64) {
+	c := Command{Remove, key, 0, make(chan interface{})}
+	m.c <- c
 }
