@@ -1,4 +1,14 @@
-package main
+package cmap
+
+type OpCode int
+
+const (
+	Get OpCode = iota
+	Put
+	Remove
+	Clear
+	Size
+)
 
 type LongHashMap interface {
 	Get(key int64) (interface{}, bool)

@@ -5,19 +5,23 @@ import (
 )
 
 type SlottedLongConcurrentHashMap struct {
-	sliceShift uint
-	sliceMask uint
+	sliceShift int
+	sliceMask int
 	slices []map[int64]interface{}
 	locks []sync.RWMutex
 }
 
 func longHash(key int64) int {
-	h := (key ^ (key >>> 32)).(int)
-	h ^= (h >>> 20) ^ (h >>> 12)
-	return h ^ (h >>> 7) ^ (h >>> 4)
+	h := int(key ^ (key >> 32))
+	h ^= (h >> 20) ^ (h >> 12)
+	return h ^ (h >> 7) ^ (h >> 4)
 }
 
-func NewSlottedLongConcurrentHashMap(concurrencyLevel, initialCapacity uint) *SlottedLongConcurrentHashMap {
+func sliceForHash(hash, mask int, shift uint) int {
+	return (hash >> shift) & mask
+}
+
+func NewSlottedLongConcurrentHashMap(concurrencyLevel, initialCapacity int) *SlottedLongConcurrentHashMap {
 	sshift := 0
 	ssize := 1
 	for ssize < concurrencyLevel {
@@ -41,8 +45,8 @@ func NewSlottedLongConcurrentHashMap(concurrencyLevel, initialCapacity uint) *Sl
 		cap <<= 1
 	}
 
-	for i := range m.segments {
-		m.segments[i] = make(map[int64]interface{}, cap)
+	for i := range m.slices {
+		m.slices[i] = make(map[int64]interface{}, cap)
 	}
 
 	return m
@@ -50,22 +54,22 @@ func NewSlottedLongConcurrentHashMap(concurrencyLevel, initialCapacity uint) *Sl
 
 func (m *SlottedLongConcurrentHashMap) Put(key int64, value interface{}) {
 	hash := longHash(key)
-	segment := (hash >>> m.sliceShift) & m.sliceMask
+	segment := sliceForHash(hash, m.sliceMask, uint(m.sliceShift))
 
 	m.locks[segment].Lock()
 	defer m.locks[segment].Unlock()
 
-	m.segments[segment][key] = value
+	m.slices[segment][key] = value
 }
 
 func (m *SlottedLongConcurrentHashMap) Get(key int64) (interface{}, bool) {
 	hash := longHash(key)
-	segment := (hash >>> m.sliceShift) & m.sliceMask
+	segment := sliceForHash(hash, m.sliceMask, uint(m.sliceShift))
 
 	m.locks[segment].RLock()
 	defer m.locks[segment].RUnlock()
 
-	value, ok := m.segments[segment][key]
+	value, ok := m.slices[segment][key]
 
 	return value, ok
 }
@@ -80,7 +84,7 @@ func (m *SlottedLongConcurrentHashMap) Clear() {
 
 func (m *SlottedLongConcurrentHashMap) Remove(key int64) {
 	hash := longHash(key)
-	segment := (hash >>> m.sliceShift) & m.sliceMask
+	segment := sliceForHash(hash, m.sliceMask, uint(m.sliceShift))
 	
 	m.locks[segment].Lock()
 	defer m.locks[segment].Unlock()
@@ -90,14 +94,14 @@ func (m *SlottedLongConcurrentHashMap) Remove(key int64) {
 
 func (m *SlottedLongConcurrentHashMap) Size() int {
 	size := 0
-	for _, s := range m.sizeFactors() {
+	for _, s := range m.SizeFactors() {
 		size += s
 	}
 	
 	return size
 }
 
-func (m *SlottedLongConcurrentHashMap) sizeFactors() []int {
+func (m *SlottedLongConcurrentHashMap) SizeFactors() []int {
 	factors := make([]int, m.sliceMask + 1)
 	
 	for i := range m.slices {
@@ -115,7 +119,7 @@ func (m *SlottedLongConcurrentHashMap) IsEmpty() bool {
 
 func (m *SlottedLongConcurrentHashMap) Contains(key int64) bool {
 	hash := longHash(key)
-	segment := (hash >>> m.sliceShift) & m.sliceMask
+	segment := sliceForHash(hash, m.sliceMask, uint(m.sliceShift))
 	
 	m.locks[segment].RLock()
 	defer m.locks[segment].RUnlock()
