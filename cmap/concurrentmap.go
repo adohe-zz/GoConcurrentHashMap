@@ -10,12 +10,6 @@ const (
 	default_load_factor = 0.75
 )
 
-type Any interface{}
-
-type Equable interface {
-	Equals(Any) bool
-}
-
 type WrapperKey interface {
 	Equable
 	HashCode() int
@@ -55,7 +49,7 @@ func (key LongKey) Equals(any Any) bool {
 type ConcurrentLongHashMap struct {
 	exponent uint32
 	buckets []unsafe.Pointer
-	size	int64
+	size	 int64
 	loadFactor	float64		
 }
 

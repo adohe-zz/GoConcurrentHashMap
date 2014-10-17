@@ -2,6 +2,16 @@ package cmap
 
 type OpCode int
 
+type Any interface{}
+
+type Comparable interface {
+	CompareTo(Any) int	
+}
+
+type Equable interface {
+	Equals(Any) bool
+}
+
 const (
 	Get OpCode = iota
 	Put
