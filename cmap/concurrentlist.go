@@ -23,7 +23,8 @@ func NewConcurrentList() *ConcurrentList {
 }
 
 func (list *ConcurrentList) Insert(value Any) bool {
-		
+	list.ListNode.add(value)
+	atomic.AddInt64(&list.size, 1)	
 }
 
 func (list *ConcurrentList) Size() int {
@@ -62,4 +63,30 @@ func (node *ListNode) isDeleted() bool {
 	}
 	
 	return false
+}
+
+func (node *ListNode) add(any Any) (b bool) {
+	newNode := &ListNode{}
+	for {
+		if node.isDeleted() {
+			break
+		}
+		
+		if node.addBefore(any, newNode, node.next()) {
+			b = true
+			break	
+		}
+	}
+	return	
+}
+
+func (node *ListNode) addBefore(value Any, newNode *ListNode, successor *ListNode) bool {
+	if node.next() != successor {
+		return false
+	}
+	
+	newNode.value = value
+	newNode.Pointer = unsafe.Pointer(successor)
+	
+	return atomic.CompareAndSwapPointer(&node.Pointer, unsafe.Pointer(successor), unsafe.Pointer(newNode))
 }
